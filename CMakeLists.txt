@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(capsule02) # The name of your choice for the project comes here
+project(terrain) # The name of your choice for the project comes here
 
 
 IF(WIN32)
@@ -17,7 +17,7 @@ link_directories(C:/glew-2.1.0/lib/Release/x64/)
 link_directories(C:/glfw-3.3.9.bin.WIN64/lib-vc2019/)
 
 
-add_executable(${PROJECT_NAME} capsule02.cpp) #The name of the cpp file and its path can vary
+add_executable(${PROJECT_NAME} src/main.cpp) #The name of the cpp file and its path can vary
 
 target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glew32s glfw3)
 
