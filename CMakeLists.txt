@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(terrain) # The name of your choice for the project comes here
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 IF(WIN32)
 # set stuff for windows
@@ -17,7 +18,11 @@ link_directories(C:/glew-2.1.0/lib/Release/x64/)
 link_directories(C:/glfw-3.3.9.bin.WIN64/lib-vc2019/)
 
 
-add_executable(${PROJECT_NAME} src/main.cpp) #The name of the cpp file and its path can vary
+include_directories(src/)
+
+aux_source_directory(src SOURCE)
+
+add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glew32s glfw3)
 
@@ -41,7 +46,11 @@ find_package(glfw3 REQUIRED
 # NOTE: ENCS glm installation is missing links to *.inl files so we need this line
 include_directories(/encs/pkg/glm-0.9.9.8/root/include)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+include_directories(src/)
+
+aux_source_directory(src SOURCE)
+
+add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::glew glfw)
 

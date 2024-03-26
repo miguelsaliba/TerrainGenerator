@@ -17,6 +17,14 @@ Perlin::Perlin(unsigned int seed) {
     p.insert(p.end(), p.begin(), p.end());
 }
 
+float Perlin::octaveNoise(float x, float y, int octaves, float persistence) {
+    float noise_value = 0;
+    for (int i = 0; i < octaves; ++i) {
+        noise_value += noise(x, y) * std::pow(persistence, i);
+    }
+    return noise_value;
+}
+
 float Perlin::noise(float x, float y) {
     int X = (int) std::floor(x) & 255;
     int Y = (int) std::floor(y) & 255;
