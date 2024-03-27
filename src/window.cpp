@@ -32,7 +32,7 @@ Window::Window(int width, int height, const char* title)
     glViewport(0, 0, width, height);
 
 
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     // Hide cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
 }

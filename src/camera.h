@@ -5,14 +5,20 @@
 #include "window.h"
 #include <glm/glm.hpp>
 
+enum Direction {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
+};
+
 class Camera {
 public:
     Camera(Window &w);
     glm::mat4 lookAt();
-    void move_forward();
-    void move_backward();
-    void move_left();
-    void move_right();
+    void move(Direction direction, float delta_time);
     void mouse_callback(GLFWwindow *window, double xpos, double ypos);
     void printPos();
 
@@ -29,7 +35,7 @@ private:
     bool first = false;
 
     // constants
-    static constexpr float speed = 0.05f;
+    float speed = 3.0f;
     static constexpr int fov = 90;
     static glm::vec3 world_up;
 };

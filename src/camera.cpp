@@ -7,35 +7,38 @@
 
 glm::vec3 Camera::world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-Camera::Camera(Window &w) : pos(glm::vec3(0.0f, 0.0f, 0.0f)),
+Camera::Camera(Window &w) : pos(glm::vec3(0.0f, 0.0f, -1.0f)),
                up(glm::vec3(0.0f, 1.0f, 0.0f)),
                dir(glm::vec3(0.0f, 0.0f, -1.0f)),
                window(w) {
-    right = glm::normalize(glm::cross(dir, up));
+    right = glm::normalize(glm::cross(dir, world_up));
 }
 
-void Camera::move_forward() {
-    pos += speed * dir;
-}
-
-void Camera::move_backward() {
-    pos -= speed * dir;
-}
-
-void Camera::move_right() {
-    pos += speed * right;
-}
-
-void Camera::move_left() {
-    pos -= speed * right;
+void Camera::move(Direction direction, float deltaTime) {
+    switch (direction) {
+        case FORWARD:
+            pos += speed * dir * deltaTime;
+            break;
+        case BACKWARD:
+            pos -= speed * dir * deltaTime;
+            break;
+        case LEFT:
+            pos -= speed * right * deltaTime;
+            break;
+        case RIGHT:
+            pos += speed * right * deltaTime;
+            break;
+        case UP:
+            pos += speed * up * deltaTime;
+            break;
+        case DOWN:
+            pos -= speed * up * deltaTime;
+            break;
+        }
 }
 
 glm::mat4 Camera::lookAt() {
     return glm::lookAt(pos, pos + dir, up);
-}
-
-void Camera::printPos() {
-    std::cout << "Pos: (" << pos.x << ", " << pos.y << ", " << pos.z << ')' << std::endl;
 }
 
 void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
@@ -45,7 +48,7 @@ void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
         first = false;
     }
     double xdelta = xpos - xprev;
-    double ydelta = ypos - yprev;
+    double ydelta = yprev - ypos;
     xprev = xpos;
     yprev = ypos;
 
@@ -57,7 +60,7 @@ void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
     if (pitch > 89.0f) {
         pitch = 89.0f;
-    } else if (pitch < -89.0f) {
+    } if (pitch < -89.0f) {
         pitch = -89.0f;
     }
 
@@ -69,3 +72,8 @@ void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     right = glm::normalize(glm::cross(dir, world_up));
     up = glm::normalize(glm::cross(right, dir));
 }
+
+void Camera::printPos() {
+    std::cout << "Pos: (" << pos.x << ", " << pos.y << ", " << pos.z << ')' << std::endl;
+}
+

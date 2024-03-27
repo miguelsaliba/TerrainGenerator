@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "window.h"
 #include "shader.h"
+#include "perlin.h"
 #include <vector>
 
 #define GLEW_STATIC 1
@@ -11,10 +12,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+
 void initImGui();
 void mouse_callback(GLFWwindow *w, double xpos, double ypos);
-void key_callback(GLFWwindow *w);
-void generate_terrain(unsigned int &VAO, unsigned int &EBO);
+void key_callback(GLFWwindow *w, float deltaTime);
+void generate_terrain(unsigned int &VAO);
 
 
 Camera *camera;
@@ -26,25 +28,34 @@ int main(int argc, char *argv[]) {
     camera = new Camera(*window);
 
     Shader shader("shader.vert", "shader.frag");
-    unsigned int VAO, EBO;
-    generate_terrain(VAO, EBO);
+    unsigned int VAO;
+    generate_terrain(VAO);
 
     glfwSetCursorPosCallback(window->getGLFWWindow(), mouse_callback);
 
     glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
 
-    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)Constants::WIDTH / (float)Constants::HEIGHT, 0.1f, 900.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)Constants::WIDTH / (float)Constants::HEIGHT, 0.1f, 100.0f);
     shader.use();
 
+    float lastFrame = 0.0f;
+    float deltaTime = 0.0f;
+
     while (!glfwWindowShouldClose(window->getGLFWWindow())) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.setMat4("projection", projection);
+        shader.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        shader.setMat4("model", model);
         shader.setMat4("view", camera->lookAt());
-        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, 0);
+        shader.setMat4("projection", projection);
+        glDrawElements(GL_TRIANGLES, 100*100, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window->getGLFWWindow());
         glfwPollEvents();
-        key_callback(window->getGLFWWindow());
+        key_callback(window->getGLFWWindow(), deltaTime);
     }
 
     delete camera;
@@ -53,38 +64,39 @@ int main(int argc, char *argv[]) {
 }
 
 // TODO: move to terrain class
-void generate_terrain(unsigned int &VAO, unsigned int &EBO) {
+void generate_terrain(unsigned int &VAO) {
     // Create vertices
-    std::vector<float> vertices{
-        -0.5f, -0.5f, -0.9f,
-         0.5f, -0.5f, -0.9f,
-         0.0f,  0.5f, -0.9f
-    };
+    Perlin perlin(14);
+    std::vector<float> vertices;
     // TODO: change to terrain width and height
-    //
-    // for (int i = 0; i < Constants::HEIGHT; i++) {
-    //     for (int j = 0; j < Constants::WIDTH; j++) {
-    //         vertices.push_back(j);
-    //         vertices.push_back(0.4);
-    //         vertices.push_back(-i);
-    //     }
-    // }
+    int terWidth = 100;
+    int terHeight = 100;
+    for (int i = 0; i < terHeight; i++) {
+        for (int j = 0; j < terWidth; j++) {
+            float x = (float)j / terWidth * 256;
+            float z = (float)i / terHeight * 256;
+            vertices.push_back(x);
+            vertices.push_back(perlin.octaveNoise(x, z, 8, 0.5f));
+            vertices.push_back(z);
+            // std::cout << j<< " " << perlin.octaveNoise(j, i, 4, 0.5f) << " " << i<< std::endl;
+        }
+    }
 
     // Create indices
-    std::vector<unsigned int> indices{0, 1, 2};
-    // for (int i = 0; i < Constants::HEIGHT - 1; i++) {
-    //     for (int j = 0; j < Constants::WIDTH - 1; j++) {
-    //         indices.push_back(i       * Constants::WIDTH + j    );
-    //         indices.push_back(i       * Constants::WIDTH + j + 1);
-    //         indices.push_back((i + 1) * Constants::WIDTH + j + 1);
-    //         indices.push_back(i       * Constants::WIDTH + j    );
-    //         indices.push_back((i + 1) * Constants::WIDTH + j + 1);
-    //         indices.push_back((i + 1) * Constants::WIDTH + j    );
-    //     }
-    // }
+    std::vector<unsigned int> indices;
+    for (int i = 0; i < terHeight - 1; i++) {
+        for (int j = 0; j < terWidth - 1; j++) {
+            indices.push_back(i       * terWidth + j    );
+            indices.push_back(i       * terWidth + j + 1);
+            indices.push_back((i + 1) * terWidth + j + 1);
+            indices.push_back(i       * terWidth + j    );
+            indices.push_back((i + 1) * terWidth + j + 1);
+            indices.push_back((i + 1) * terWidth + j    );
+        }
+    }
 
     // Create VAO, VBO, EBO
-    unsigned int VBO;
+    unsigned int VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -106,18 +118,27 @@ void mouse_callback(GLFWwindow *w, double xpos, double ypos) {
     camera->mouse_callback(w, xpos, ypos);
 }
 
-void key_callback(GLFWwindow *w) {
+void key_callback(GLFWwindow *w, float deltaTime) {
+    if (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        deltaTime *= 4;
+    }
     if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
-        camera->move_forward();
+        camera->move(FORWARD, deltaTime);
     }
     if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
-        camera->move_backward();
+        camera->move(BACKWARD, deltaTime);
     }
     if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
-        camera->move_left();
+        camera->move(LEFT, deltaTime);
     }
     if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
-        camera->move_right();
+        camera->move(RIGHT, deltaTime);
+    }
+    if (glfwGetKey(w, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        camera->move(UP, deltaTime);
+    }
+    if (glfwGetKey(w, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        camera->move(DOWN, deltaTime);
     }
     if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(w, true);
