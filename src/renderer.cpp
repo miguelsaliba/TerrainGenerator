@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "camera.h"
+#include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "terrain.h"
@@ -27,6 +28,7 @@ Renderer::Renderer()
         ImGui_ImplGlfw_CursorPosCallback(w, xpos, ypos);
     };
     glfwSetCursorPosCallback(window.getGLFWWindow(), func);
+    glfwSetKeyCallback(window.getGLFWWindow(), &Renderer::key_callback);
 
     glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
 
@@ -44,20 +46,22 @@ void Renderer::loop() {
         shader.use();
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
-        glDrawElements(GL_TRIANGLES, terrain.size() * 2, GL_UNSIGNED_INT, 0);
 
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::SetNextWindowSizeConstraints(ImVec2(250, 100), ImVec2(250, 100));
         // render your GUI
-        ImGui::Begin("Demo window");
-        ImGui::Button("Hello!");
+        ImGui::Begin("Config");
+        ImGui::InputInt("Terrain x", &terrain.width);
+        ImGui::InputInt("Terrain y", &terrain.height);
         if (ImGui::Button("Generate Terrain")) {
             terrain.generate_terrain();
         }
         ImGui::End();
 
+        glDrawElements(GL_TRIANGLES, terrain.size() * 2, GL_UNSIGNED_INT, 0);
         // Render dear imgui into screen
         ImGui::Render();
 
@@ -67,11 +71,12 @@ void Renderer::loop() {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window.getGLFWWindow());
-        key_callback(window.getGLFWWindow(), deltaTime);
+        key_handler(window.getGLFWWindow(), deltaTime);
     }
 }
 
-void Renderer::key_callback(GLFWwindow *w, float deltaTime) {
+// Using this for buttons that get held down (movement)
+void Renderer::key_handler(GLFWwindow *w, float deltaTime) {
     if (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         deltaTime *= 4; // Act as if more time passed so the movement speed is faster,
                         // there is definitely a better way of doing this but it's fine.
@@ -94,10 +99,14 @@ void Renderer::key_callback(GLFWwindow *w, float deltaTime) {
     if (glfwGetKey(w, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
         camera.move(DOWN, deltaTime);
     }
-    if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        if (glfwGetInputMode(w, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
-            glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+// Using callback for things that need to be toggled so it doesn't get spammed
+void Renderer::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         else
-            glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }

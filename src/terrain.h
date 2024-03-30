@@ -11,11 +11,11 @@ public:
     void set_dimensions(int width, int height);
     int size();
 
-private:
-    Perlin perlin;
-    unsigned int VAO;
     int width;
     int height;
+private:
+    Perlin perlin;
+    unsigned int VAO, VBO, EBO;
     std::vector<int> indices;
     std::vector<float> vertices;
 };

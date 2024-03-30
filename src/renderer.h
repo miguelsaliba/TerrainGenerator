@@ -11,8 +11,9 @@ public:
     Renderer();
     ~Renderer() = default;
     void loop();
-    void key_callback(GLFWwindow *w, float deltaTime);
+    void key_handler(GLFWwindow *w, float deltaTime);
     void generate_terrain(unsigned int &VAO);
+    static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 private:
     Window window;

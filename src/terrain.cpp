@@ -16,13 +16,18 @@ void Terrain::set_dimensions(int w, int h) {
 }
 
 void Terrain::generate_terrain() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
     // Create vertices
+    vertices.clear();
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             float x = (float)j * 0.07;
             float z = (float)i * 0.07;
+            float noise_value = perlin.octaveNoise(x, z, 7, 0.5f) * 2;
             vertices.push_back(j);
-            vertices.push_back(perlin.octaveNoise(x, z, 7, 0.5f) * 2);
+            vertices.push_back(noise_value);
             vertices.push_back(i);
             // std::cout << j<< " " << perlin.octaveNoise(j, i, 4, 0.5f) << " " << i<< std::endl;
         }
@@ -42,7 +47,6 @@ void Terrain::generate_terrain() {
     }
 
     // Create VAO, VBO, EBO
-    unsigned int VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
