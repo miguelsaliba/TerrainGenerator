@@ -12,7 +12,7 @@
 Renderer::Renderer()
     : window(Constants::WIDTH, Constants::HEIGHT, "Terrain Generator"),
     camera(),
-    shader("../shaders/shader.vert", "../shaders/shader.frag"),
+    shader("../shaders/mountain.vert", "../shaders/mountain.frag"),
     terrain(100, 100)
 {
     unsigned int VAO;
