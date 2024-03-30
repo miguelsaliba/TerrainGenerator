@@ -3,7 +3,7 @@
 #include <cmath>
 #include <random>
 
-Perlin::Perlin() : Perlin(0) {}
+Perlin::Perlin() : Perlin(random()) {}
 
 Perlin::Perlin(unsigned int seed) {
     for (int i = 0; i < 256; i++) {

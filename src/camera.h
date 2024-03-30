@@ -16,14 +16,14 @@ enum Direction {
 
 class Camera {
 public:
-    Camera(Window &w);
+    Camera();
     glm::mat4 lookAt();
+    glm::mat4 projection();
     void move(Direction direction, float delta_time);
     void mouse_callback(GLFWwindow *window, double xpos, double ypos);
     void printPos();
 
 private:
-    Window &window;
     glm::vec3 pos;
     glm::vec3 up;
     glm::vec3 dir;
@@ -36,7 +36,7 @@ private:
 
     // constants
     float speed = 3.0f;
-    static constexpr int fov = 90;
+    float fov = 90.0f;
     static glm::vec3 world_up;
 };
 

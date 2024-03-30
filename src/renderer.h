@@ -2,20 +2,23 @@
 #define RENDERER_H_
 
 #include "camera.h"
+#include "shader.h"
+#include "terrain.h"
 #include "window.h"
 
 class Renderer {
 public:
     Renderer();
-    ~Renderer();
-    void init_camera();
-    void init_window();
-    void render();
-    void update();
+    ~Renderer() = default;
+    void loop();
+    void key_callback(GLFWwindow *w, float deltaTime);
+    void generate_terrain(unsigned int &VAO);
 
 private:
-    Camera *camera;
-    Window *window;
+    Window window;
+    Camera camera;
+    Shader shader;
+    Terrain terrain;
 };
 
 #endif  // RENDERER_H_

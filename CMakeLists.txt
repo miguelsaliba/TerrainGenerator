@@ -3,6 +3,10 @@ project(terrain) # The name of your choice for the project comes here
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# imgui stuff
+include_directories(include)
+file(GLOB INCLUDE "include/*.cpp")
+
 IF(WIN32)
 # set stuff for windows
 find_package(OpenGL REQUIRED)
@@ -22,7 +26,7 @@ include_directories(src/)
 
 aux_source_directory(src SOURCE)
 
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE} ${INCLUDE})
 
 target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glew32s glfw3)
 
@@ -50,7 +54,7 @@ include_directories(src/)
 
 aux_source_directory(src SOURCE)
 
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE} ${INCLUDE})
 
 target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::glew glfw)
 

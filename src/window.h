@@ -7,7 +7,7 @@
 class Window {
 public:
     Window(int width, int height, const char* title);
-    void startLoop();
+    void initImGui();
     GLFWwindow *getGLFWWindow() {return window;};
     ~Window();
 
