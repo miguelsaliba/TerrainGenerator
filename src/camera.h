@@ -22,6 +22,7 @@ public:
     void move(Direction direction, float delta_time);
     void mouse_callback(GLFWwindow *window, double xpos, double ypos);
     void printPos();
+    void ImGui();
 
 private:
     glm::vec3 pos;
@@ -35,7 +36,7 @@ private:
     bool first = false;
 
     // constants
-    float speed = 3.0f;
+    float speed = 10.0f;
     float fov = 90.0f;
     static glm::vec3 world_up;
 };

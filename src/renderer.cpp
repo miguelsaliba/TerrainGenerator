@@ -37,37 +37,62 @@ Renderer::Renderer()
 
 void Renderer::loop() {
     float lastFrame = 0.0f;
+    glm::vec3 lightPos(30.0f, 100.0f, 0.0f);
     while (!glfwWindowShouldClose(window.getGLFWWindow())) {
         glfwPollEvents();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
+        shader.setVec3("lightPos", lightPos);
+
+        int display_w, display_h;
+        glfwGetFramebufferSize(window.getGLFWWindow(), &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSizeConstraints(ImVec2(250, 100), ImVec2(250, 100));
-        // render your GUI
-        ImGui::Begin("Config");
-        ImGui::InputInt("Terrain x", &terrain.width);
-        ImGui::InputInt("Terrain y", &terrain.height);
-        if (ImGui::Button("Generate Terrain")) {
-            terrain.generate_terrain();
-        }
-        ImGui::End();
 
-        glDrawElements(GL_TRIANGLES, terrain.size() * 2, GL_UNSIGNED_INT, 0);
+        // ImGui::ShowDemoWindow(); // Demo window for debugging
+        ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_FirstUseEver);
+
+        ImGui::Begin("Config", NULL, ImGuiWindowFlags_MenuBar);
+
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::MenuItem("Generate")) {
+                terrain.generate_terrain();
+            }
+            if (ImGui::MenuItem("Quit")) {
+                glfwSetWindowShouldClose(window.getGLFWWindow(), true);
+            }
+            ImGui::EndMenuBar();
+        }
+
+        ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes!");
+
+        if (ImGui::CollapsingHeader("Presets")) {
+        }
+        if (ImGui::CollapsingHeader("Noise")) {
+            terrain.noise().ImGui();
+        }
+        if (ImGui::CollapsingHeader("Terrain")) {
+            terrain.ImGui();
+        }
+        if (ImGui::CollapsingHeader("Camera")) {
+            camera.ImGui();
+        }
+        ImGui::InputFloat3("LightPos", &lightPos[0]);
+        ImGui::End(); // End Config
+
+        glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);
+
         // Render dear imgui into screen
         ImGui::Render();
-
-        int display_w, display_h;
-        glfwGetFramebufferSize(window.getGLFWWindow(), &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window.getGLFWWindow());
@@ -99,6 +124,9 @@ void Renderer::key_handler(GLFWwindow *w, float deltaTime) {
     if (glfwGetKey(w, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
         camera.move(DOWN, deltaTime);
     }
+    if (glfwGetKey(w, GLFW_KEY_ENTER) == GLFW_PRESS) {
+        terrain.generate_terrain();
+    }
 }
 
 // Using callback for things that need to be toggled so it doesn't get spammed
@@ -108,5 +136,14 @@ void Renderer::key_callback(GLFWwindow *window, int key, int scancode, int actio
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         else
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+    // wireframe
+    if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+        static bool wireframe = false;
+        wireframe = !wireframe;
+        if (wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }

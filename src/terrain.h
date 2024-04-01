@@ -10,12 +10,19 @@ public:
     void generate_terrain();
     void set_dimensions(int width, int height);
     int size();
+    void ImGui();
+    Perlin &noise();
 
+private:
+    // NOTE: KEEP width and height in this order for ImGui.
     int width;
     int height;
-private:
+    float triangle_size = 0.07;
+    
     Perlin perlin;
-    unsigned int VAO, VBO, EBO;
+
+    unsigned int VAO, EBO;
+    unsigned int VBO[2];
     std::vector<int> indices;
     std::vector<float> vertices;
 };

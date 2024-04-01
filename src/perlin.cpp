@@ -1,11 +1,39 @@
 #include "perlin.h"
 #include <algorithm>
-#include <cmath>
 #include <random>
+#include <imgui.h>
 
-Perlin::Perlin() : Perlin(random()) {}
+Perlin::Perlin() {
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist;
 
-Perlin::Perlin(unsigned int seed) {
+    seed = dist(rng);
+    shuffle();
+}
+
+Perlin::Perlin(unsigned int seed) : seed(seed) {
+    shuffle();
+}
+
+void Perlin::ImGui() {
+    // 0 to remove step
+    if (ImGui::InputInt("Seed", &seed, 0)) {
+        shuffle();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Random")) {
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> dist;
+
+        seed = dist(rng);
+        shuffle();
+    }
+}
+
+void Perlin::shuffle() {
+    p.clear();
     for (int i = 0; i < 256; i++) {
         p.push_back(i);
     }

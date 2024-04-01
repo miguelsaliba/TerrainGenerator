@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "constants.h"
 
+#include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -43,6 +44,13 @@ void Camera::move(Direction direction, float deltaTime) {
 
 glm::mat4 Camera::lookAt() {
     return glm::lookAt(pos, pos + dir, up);
+}
+
+void Camera::ImGui() {
+    ImGui::InputFloat("Speed", &speed);
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+    ImGui::Text("Yaw: %f", yaw);
+    ImGui::Text("Pitch: %f", pitch);
 }
 
 void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {

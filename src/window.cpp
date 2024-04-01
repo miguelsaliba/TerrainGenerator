@@ -37,7 +37,7 @@ Window::Window(int width, int height, const char* title)
 
     glEnable(GL_DEPTH_TEST);
     // Hide cursor
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     initImGui();
 }
