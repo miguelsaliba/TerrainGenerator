@@ -19,13 +19,13 @@ Renderer::Renderer()
     unsigned int VAO;
     terrain.generate_terrain();
 
+
     // simple way to set the callback of the pointer.
     glfwSetWindowUserPointer(window.getGLFWWindow(), &camera);
     auto func = [](GLFWwindow *w, double xpos, double ypos) {
         if (glfwGetInputMode(w, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
             static_cast<Camera*>(glfwGetWindowUserPointer(w))->mouse_callback(w, xpos, ypos);
         }
-        ImGui_ImplGlfw_CursorPosCallback(w, xpos, ypos);
     };
     glfwSetCursorPosCallback(window.getGLFWWindow(), func);
     glfwSetKeyCallback(window.getGLFWWindow(), &Renderer::key_callback);
@@ -33,11 +33,18 @@ Renderer::Renderer()
     glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
 
     shader.use();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui_ImplGlfw_InitForOpenGL(window.getGLFWWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui::StyleColorsDark();
 }
 
 void Renderer::loop() {
     float lastFrame = 0.0f;
-    glm::vec3 lightPos(30.0f, 100.0f, 0.0f);
+    glm::vec3 lightPos(30.0f, 10.0f, 0.0f);
     while (!glfwWindowShouldClose(window.getGLFWWindow())) {
         glfwPollEvents();
         float currentFrame = glfwGetTime();
@@ -47,6 +54,7 @@ void Renderer::loop() {
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
         shader.setVec3("lightPos", lightPos);
+        shader.setVec3("cameraPos", camera.position());
 
         int display_w, display_h;
         glfwGetFramebufferSize(window.getGLFWWindow(), &display_w, &display_h);
@@ -86,7 +94,9 @@ void Renderer::loop() {
         if (ImGui::CollapsingHeader("Camera")) {
             camera.ImGui();
         }
-        ImGui::InputFloat3("LightPos", &lightPos[0]);
+        if (ImGui::CollapsingHeader("Light")) {
+            ImGui::InputFloat3("LightPos", &lightPos[0]);
+        }
         ImGui::End(); // End Config
 
         glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);

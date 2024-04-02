@@ -7,7 +7,9 @@
 
 Terrain::Terrain() : width(100), height(100) { }
 
-Terrain::Terrain(int w, int h) : width(w), height(h) { }
+Terrain::Terrain(int w, int h) : width(w), height(h) {
+    perlin = Perlin(14);
+}
 
 int Terrain::size() {
     return indices.size();
@@ -19,8 +21,7 @@ void Terrain::set_dimensions(int w, int h) {
 }
 
 void Terrain::generate_terrain() {
-    glDeleteBuffers(1, &VBO[0]);
-    glDeleteBuffers(1, &VBO[1]);
+    glDeleteBuffers(2, &VBO[0]);
     glDeleteBuffers(1, &EBO);
     glDeleteVertexArrays(1, &VAO);
     // Create vertices
@@ -29,7 +30,7 @@ void Terrain::generate_terrain() {
         for (int j = 0; j < width; j++) {
             float x = (float)j * triangle_size;
             float z = (float)i * triangle_size;
-            float noise_value = perlin.octaveNoise(x, z, 7, 0.5f) * 2;
+            float noise_value = perlin.octaveNoise(x, z) * 2;
             vertices.push_back(j);
             vertices.push_back(noise_value);
             vertices.push_back(i);
@@ -38,6 +39,7 @@ void Terrain::generate_terrain() {
     }
 
     // Create indices
+    indices.clear();
     for (int i = 0; i < height - 1; i++) {
         for (int j = 0; j < width - 1; j++) {
             indices.push_back(i       * width + j    );
@@ -70,21 +72,19 @@ void Terrain::generate_terrain() {
     // Bind VAO, VBO, EBO
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(1);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 }
 
 Perlin &Terrain::noise() {

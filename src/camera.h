@@ -19,6 +19,7 @@ public:
     Camera();
     glm::mat4 lookAt();
     glm::mat4 projection();
+    glm::vec3 &position();
     void move(Direction direction, float delta_time);
     void mouse_callback(GLFWwindow *window, double xpos, double ypos);
     void printPos();

@@ -39,18 +39,8 @@ Window::Window(int width, int height, const char* title)
     // Hide cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    initImGui();
 }
 
-void Window::initImGui() {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
-    ImGui::StyleColorsDark();
-}
 
 Window::~Window() {
     ImGui_ImplOpenGL3_Shutdown();

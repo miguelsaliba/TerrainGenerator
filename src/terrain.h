@@ -17,7 +17,7 @@ private:
     // NOTE: KEEP width and height in this order for ImGui.
     int width;
     int height;
-    float triangle_size = 0.07;
+    float triangle_size = 0.025;
     
     Perlin perlin;
 

@@ -30,6 +30,9 @@ void Perlin::ImGui() {
         seed = dist(rng);
         shuffle();
     }
+    ImGui::InputFloat("Persistence", &persistence);
+    ImGui::InputInt("Octaves", &octaves);
+    ImGui::InputFloat("Scale", &scale);
 }
 
 void Perlin::shuffle() {
@@ -45,12 +48,17 @@ void Perlin::shuffle() {
     p.insert(p.end(), p.begin(), p.end());
 }
 
-float Perlin::octaveNoise(float x, float y, int octaves, float persistence) {
-    float noise_value = 0;
-    for (int i = 0; i < octaves; ++i) {
-        noise_value += noise(x, y) * std::pow(persistence, i);
+float Perlin::octaveNoise(float x, float y) {
+    float total = 0;
+    float frequency = 1;
+    float amplitude = 1;
+    for (int i = 0; i < octaves; i++) {
+        total += noise(x * frequency, y * frequency) * amplitude;
+        
+        amplitude *= persistence;
+        frequency *= 2;
     }
-    return noise_value;
+    return total * scale;
 }
 
 float Perlin::noise(float x, float y) {

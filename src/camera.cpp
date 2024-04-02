@@ -9,7 +9,7 @@
 
 glm::vec3 Camera::world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-Camera::Camera() : pos(glm::vec3(0.0f, 0.0f, -1.0f)),
+Camera::Camera() : pos(glm::vec3(0.0f, 10.0f, -1.0f)),
                up(glm::vec3(0.0f, 1.0f, 0.0f)),
                dir(glm::vec3(0.0f, 0.0f, -1.0f)) {
     right = glm::normalize(glm::cross(dir, world_up));
@@ -17,6 +17,10 @@ Camera::Camera() : pos(glm::vec3(0.0f, 0.0f, -1.0f)),
 
 glm::mat4 Camera::projection() {
     return glm::perspective(glm::radians(fov), (float) Constants::WIDTH / (float)Constants::HEIGHT, 0.1f, 100.0f);
+}
+
+glm::vec3 &Camera::position() {
+    return pos;
 }
 
 void Camera::move(Direction direction, float deltaTime) {
