@@ -22,6 +22,7 @@ public:
     glm::vec3 &position();
     void move(Direction direction, float delta_time);
     void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+    void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
     void printPos();
     void ImGui();
 
@@ -34,7 +35,8 @@ private:
     double yprev = Constants::HEIGHT / 2.0f;
     float yaw = 45.0f;
     float pitch = 0.0f;
-    bool first = false;
+    float near = 0.1f;
+    float far = 400.0f;
 
     // constants
     float speed = 10.0f;

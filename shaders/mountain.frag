@@ -7,14 +7,14 @@ in vec3 FragPos;
 
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
+uniform vec3 lightColor;
 
 void main() {
-    float specularStrength = 0.3;
+    float specularStrength = 0.1;
     float ambientStrength = 0.1;
 
 
     vec3 norm = normalize(normal);
-    vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
     vec3 lightDir = normalize(lightPos - FragPos);
     vec3 cameraDir = normalize(cameraPos - FragPos);

@@ -9,14 +9,14 @@
 
 glm::vec3 Camera::world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-Camera::Camera() : pos(glm::vec3(0.0f, 10.0f, -1.0f)),
+Camera::Camera() : pos(glm::vec3(200.0f, 10.0f, 200.0f)),
                up(glm::vec3(0.0f, 1.0f, 0.0f)),
                dir(glm::vec3(0.0f, 0.0f, -1.0f)) {
     right = glm::normalize(glm::cross(dir, world_up));
 }
 
 glm::mat4 Camera::projection() {
-    return glm::perspective(glm::radians(fov), (float) Constants::WIDTH / (float)Constants::HEIGHT, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov), (float) Constants::WIDTH / (float) Constants::HEIGHT, near, far);
 }
 
 glm::vec3 &Camera::position() {
@@ -52,17 +52,15 @@ glm::mat4 Camera::lookAt() {
 
 void Camera::ImGui() {
     ImGui::InputFloat("Speed", &speed);
+    ImGui::InputFloat("FOV", &fov);
+    ImGui::InputFloat("Near", &near);
+    ImGui::InputFloat("Far", &far);
     ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
     ImGui::Text("Yaw: %f", yaw);
     ImGui::Text("Pitch: %f", pitch);
 }
 
 void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (first) {
-        xprev = xpos;
-        yprev = ypos;
-        first = false;
-    }
     double xdelta = xpos - xprev;
     double ydelta = yprev - ypos;
     xprev = xpos;
@@ -87,6 +85,16 @@ void Camera::mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     dir = glm::normalize(new_dir);
     right = glm::normalize(glm::cross(dir, world_up));
     up = glm::normalize(glm::cross(right, dir));
+}
+
+void Camera::scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    fov -= yoffset * 2;
+    if (fov < 1.0f) {
+        fov = 1.0f;
+    }
+    if (fov > 90.0f) {
+        fov = 90.0f;
+    }
 }
 
 void Camera::printPos() {

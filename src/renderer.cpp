@@ -14,7 +14,8 @@ Renderer::Renderer()
     : window(Constants::WIDTH, Constants::HEIGHT, "Terrain Generator"),
     camera(),
     shader("../shaders/mountain.vert", "../shaders/mountain.frag"),
-    terrain(100, 100)
+    terrain(400, 400),
+    light()
 {
     unsigned int VAO;
     terrain.generate_terrain();
@@ -22,29 +23,37 @@ Renderer::Renderer()
 
     // simple way to set the callback of the pointer.
     glfwSetWindowUserPointer(window.getGLFWWindow(), &camera);
-    auto func = [](GLFWwindow *w, double xpos, double ypos) {
+    auto mousecb = [](GLFWwindow *w, double xpos, double ypos) {
         if (glfwGetInputMode(w, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
             static_cast<Camera*>(glfwGetWindowUserPointer(w))->mouse_callback(w, xpos, ypos);
         }
     };
-    glfwSetCursorPosCallback(window.getGLFWWindow(), func);
+    auto scrollcb = [](GLFWwindow *w, double xoffset, double yoffset) {
+        static_cast<Camera*>(glfwGetWindowUserPointer(w))->scroll_callback(w, xoffset, yoffset);
+    };
+
+    glfwSetCursorPosCallback(window.getGLFWWindow(), mousecb);
+    glfwSetScrollCallback(window.getGLFWWindow(), scrollcb);
     glfwSetKeyCallback(window.getGLFWWindow(), &Renderer::key_callback);
 
-    glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
+    background_color = glm::vec3(0.6f, 0.8f, 1.0f);
+    set_background_color();
 
     shader.use();
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    io = ImGui::GetIO();
     ImGui_ImplGlfw_InitForOpenGL(window.getGLFWWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
     ImGui::StyleColorsDark();
 }
 
+// TODO: create an array of colors and heights for the terrain and send them to the shaders.
 void Renderer::loop() {
     float lastFrame = 0.0f;
-    glm::vec3 lightPos(30.0f, 10.0f, 0.0f);
+    glm::vec3 backgroundColor(0.6f, 0.8f, 1.0f);
+
     while (!glfwWindowShouldClose(window.getGLFWWindow())) {
         glfwPollEvents();
         float currentFrame = glfwGetTime();
@@ -53,7 +62,8 @@ void Renderer::loop() {
         shader.use();
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
-        shader.setVec3("lightPos", lightPos);
+        shader.setVec3("lightPos", light.position());
+        shader.setVec3("lightColor", light.color());
         shader.setVec3("cameraPos", camera.position());
 
         int display_w, display_h;
@@ -61,53 +71,61 @@ void Renderer::loop() {
         glViewport(0, 0, display_w, display_h);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // ImGui::ShowDemoWindow(); // Demo window for debugging
-        ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_FirstUseEver);
-
-        ImGui::Begin("Config", NULL, ImGuiWindowFlags_MenuBar);
-
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::MenuItem("Generate")) {
-                terrain.generate_terrain();
-            }
-            if (ImGui::MenuItem("Quit")) {
-                glfwSetWindowShouldClose(window.getGLFWWindow(), true);
-            }
-            ImGui::EndMenuBar();
-        }
-
-        ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes!");
-
-        if (ImGui::CollapsingHeader("Presets")) {
-        }
-        if (ImGui::CollapsingHeader("Noise")) {
-            terrain.noise().ImGui();
-        }
-        if (ImGui::CollapsingHeader("Terrain")) {
-            terrain.ImGui();
-        }
-        if (ImGui::CollapsingHeader("Camera")) {
-            camera.ImGui();
-        }
-        if (ImGui::CollapsingHeader("Light")) {
-            ImGui::InputFloat3("LightPos", &lightPos[0]);
-        }
-        ImGui::End(); // End Config
-
-        glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);
-
-        // Render dear imgui into screen
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        render_ImGui();
 
         glfwSwapBuffers(window.getGLFWWindow());
         key_handler(window.getGLFWWindow(), deltaTime);
     }
+}
+
+void Renderer::render_ImGui() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    // ImGui::ShowDemoWindow(); // Demo window for debugging
+    ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("Config", NULL, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::MenuItem("Generate")) {
+            terrain.generate_terrain();
+        }
+        if (ImGui::MenuItem("Quit")) {
+            glfwSetWindowShouldClose(window.getGLFWWindow(), true);
+        }
+        ImGui::EndMenuBar();
+    }
+
+    // Accurate FPS counter
+    ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+    ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes!");
+
+    if (ImGui::CollapsingHeader("Presets")) {
+    }
+    if (ImGui::CollapsingHeader("Noise")) {
+        terrain.noise().ImGui();
+    }
+    if (ImGui::CollapsingHeader("Terrain")) {
+        terrain.ImGui();
+    }
+    if (ImGui::CollapsingHeader("Camera")) {
+        camera.ImGui();
+    }
+    if (ImGui::CollapsingHeader("Light")) {
+        light.ImGui();
+        if (ImGui::ColorEdit3("Background Color", &background_color[0])) {
+            set_background_color();
+        }
+    }
+    ImGui::End(); // End Config
+
+    glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);
+
+    // Render dear imgui into screen
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 // Using this for buttons that get held down (movement)
@@ -156,4 +174,8 @@ void Renderer::key_callback(GLFWwindow *window, int key, int scancode, int actio
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+}
+
+void Renderer::set_background_color() {
+    glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
 }

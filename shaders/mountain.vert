@@ -15,7 +15,7 @@ void main()
         vertColor = vec3(0.3, 0.4, 1.0);
     }
     else if (aPos.y < 2.0) {
-        vertColor = vec3(0.3, 0.6, 0.2);
+        vertColor = vec3(0.2, 0.25, 0.3);
     }
     else {
         vertColor = vec3(0.8, 0.85, 0.9);
