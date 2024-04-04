@@ -12,14 +12,14 @@ public:
     float noise(float x, float y);
     float octaveNoise(float x, float y);
     void shuffle();
-    void ImGui();
+    bool ImGui();
 
 
 private:
     int seed;
-    int octaves = 6;
-    float persistence = 0.5;
-    float scale = 2;
+    int octaves = 10;
+    float persistence = 0.512;
+    float scale = 15;
     static float lerp(float amount, float left, float right);
     static float grad(int hash, float x, float y);
     static float fade(float t);

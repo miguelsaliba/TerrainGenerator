@@ -29,7 +29,9 @@ Renderer::Renderer()
         }
     };
     auto scrollcb = [](GLFWwindow *w, double xoffset, double yoffset) {
-        static_cast<Camera*>(glfwGetWindowUserPointer(w))->scroll_callback(w, xoffset, yoffset);
+        if (glfwGetInputMode(w, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) {
+            static_cast<Camera*>(glfwGetWindowUserPointer(w))->scroll_callback(w, xoffset, yoffset);
+        }
     };
 
     glfwSetCursorPosCallback(window.getGLFWWindow(), mousecb);
@@ -52,19 +54,21 @@ Renderer::Renderer()
 // TODO: create an array of colors and heights for the terrain and send them to the shaders.
 void Renderer::loop() {
     float lastFrame = 0.0f;
-    glm::vec3 backgroundColor(0.6f, 0.8f, 1.0f);
 
     while (!glfwWindowShouldClose(window.getGLFWWindow())) {
         glfwPollEvents();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        key_handler(window.getGLFWWindow(), deltaTime);
+
         shader.use();
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
         shader.setVec3("lightPos", light.position());
         shader.setVec3("lightColor", light.color());
         shader.setVec3("cameraPos", camera.position());
+        terrain.set_shader_data(shader);
 
         int display_w, display_h;
         glfwGetFramebufferSize(window.getGLFWWindow(), &display_w, &display_h);
@@ -74,7 +78,6 @@ void Renderer::loop() {
         render_ImGui();
 
         glfwSwapBuffers(window.getGLFWWindow());
-        key_handler(window.getGLFWWindow(), deltaTime);
     }
 }
 
@@ -83,7 +86,7 @@ void Renderer::render_ImGui() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // ImGui::ShowDemoWindow(); // Demo window for debugging
+    ImGui::ShowDemoWindow(); // Demo window for debugging
     ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_FirstUseEver);
 
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_MenuBar);
@@ -98,17 +101,18 @@ void Renderer::render_ImGui() {
         ImGui::EndMenuBar();
     }
 
-    // Accurate FPS counter
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
     ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes!");
 
     if (ImGui::CollapsingHeader("Presets")) {
     }
     if (ImGui::CollapsingHeader("Noise")) {
-        terrain.noise().ImGui();
+        if (terrain.noise().ImGui())
+            terrain.generate_terrain();
     }
     if (ImGui::CollapsingHeader("Terrain")) {
-        terrain.ImGui();
+        if (terrain.ImGui())
+            terrain.generate_terrain();
     }
     if (ImGui::CollapsingHeader("Camera")) {
         camera.ImGui();
@@ -119,11 +123,10 @@ void Renderer::render_ImGui() {
             set_background_color();
         }
     }
-    ImGui::End(); // End Config
+    ImGui::End(); // End Config window
 
     glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);
 
-    // Render dear imgui into screen
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

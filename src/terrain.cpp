@@ -5,10 +5,26 @@
 #include <glm/fwd.hpp>
 #include <imgui.h>
 
-Terrain::Terrain() : width(100), height(100) { }
+Terrain::Terrain() : width(100), height(100) {
+    init_arrays();
+}
 
 Terrain::Terrain(int w, int h) : width(w), height(h) {
     perlin = Perlin(14);
+    init_arrays();
+}
+
+void Terrain::init_arrays() {
+    colors[0] = glm::vec3(0.2f, 0.3f, 0.8f); // water
+    colors[1] = glm::vec3(0.6f, 0.6f, 0.1f); // sand
+    colors[2] = glm::vec3(0.3f, 0.5f, 0.2f); // grass
+    colors[3] = glm::vec3(0.2f, 0.2f, 0.2f); // rock
+    colors[4] = glm::vec3(0.8f, 0.8f, 0.8f); // snow
+    heights[0] = -20.0f; // water
+    heights[1] = -10.0f; // sand
+    heights[2] = 0.0f;  // grass
+    heights[3] = 15.0f;  // rock
+    heights[4] = 200.0f;  // snow
 }
 
 int Terrain::size() {
@@ -91,7 +107,26 @@ Perlin &Terrain::noise() {
     return perlin;
 }
 
-void Terrain::ImGui() {
-    ImGui::InputInt2("Position", &width);
-    ImGui::InputFloat("Triangle size", &triangle_size);
+bool Terrain::ImGui() {
+    bool changed = false;
+    if (ImGui::InputInt2("Size", &width))
+        changed = true;
+    if (ImGui::InputFloat("Triangle size", &triangle_size))
+        changed = true;
+    ImGui::ColorEdit3("Water", &colors[0][0]);
+    ImGui::ColorEdit3("Sand", &colors[1][0]);
+    ImGui::ColorEdit3("Grass", &colors[2][0]);
+    ImGui::ColorEdit3("Rock", &colors[3][0]);
+    ImGui::ColorEdit3("Snow", &colors[4][0]);
+    ImGui::DragFloat("Water height", &heights[0], 0.1, -50, 50);
+    ImGui::DragFloat("Sand height", &heights[1], 0.1, -50, 50);
+    ImGui::DragFloat("Grass height", &heights[2], 0.1, -50, 50);
+    ImGui::DragFloat("Rock height", &heights[3], 0.1, -50, 50);
+    ImGui::DragFloat("Snow height", &heights[4], 0.1, -50, 50);
+    return changed;
+}
+
+void Terrain::set_shader_data(Shader &shader) {
+    shader.setFloatArray("heights", 5, heights);
+    shader.setVec3Array("colors", 5, colors);
 }

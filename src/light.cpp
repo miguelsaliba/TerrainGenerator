@@ -6,6 +6,6 @@ Light::Light()
 { }
 
 void Light::ImGui() {
-    ImGui::InputFloat3("Position", &position_.x);
+    ImGui::DragFloat3("Position", &position_.x);
     ImGui::ColorEdit3("Color", &color_.x);
 }
