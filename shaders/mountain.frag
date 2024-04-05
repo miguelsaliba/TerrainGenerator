@@ -5,15 +5,14 @@ in vec3 vertColor;
 in vec3 normal;
 in vec3 FragPos;
 
-uniform vec3 lightPos;
 uniform vec3 cameraPos;
+
+uniform vec3 lightPos;
 uniform vec3 lightColor;
+uniform float specularStrength;
+uniform float ambientStrength;
 
 void main() {
-    float specularStrength = 0.1;
-    float ambientStrength = 0.1;
-
-
     vec3 norm = normalize(normal);
 
     vec3 lightDir = normalize(lightPos - FragPos);

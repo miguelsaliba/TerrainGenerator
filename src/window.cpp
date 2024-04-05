@@ -22,7 +22,7 @@ Window::Window(int width, int height, const char* title)
         exit(1);
     }
     glfwMakeContextCurrent(window);
-    glewExperimental = 1;
+    glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to create GLEW" << std::endl;
         glfwTerminate();
@@ -37,7 +37,7 @@ Window::Window(int width, int height, const char* title)
 
     glEnable(GL_DEPTH_TEST);
     // Hide cursor
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 }
 

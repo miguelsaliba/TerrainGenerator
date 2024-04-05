@@ -13,7 +13,9 @@ public:
     float octaveNoise(float x, float y);
     void shuffle();
     bool ImGui();
-
+    void set_octaves(int octaves) { this->octaves = octaves; };
+    void set_persistence(float persistence) { this->persistence = persistence; };
+    void set_scale(float scale) { this->scale = scale; };
 
 private:
     int seed;

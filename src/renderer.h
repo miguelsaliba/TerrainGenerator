@@ -14,9 +14,9 @@ public:
     ~Renderer() = default;
     void loop();
     void key_handler(GLFWwindow *w, float deltaTime);
-    void generate_terrain(unsigned int &VAO);
     void set_background_color();
     void render_ImGui();
+    void set_preset(std::string preset);
     static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 private:

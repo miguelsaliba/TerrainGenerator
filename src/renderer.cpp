@@ -7,8 +7,11 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <array>
+#include <future>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <string_view>
 
 Renderer::Renderer()
     : window(Constants::WIDTH, Constants::HEIGHT, "Terrain Generator"),
@@ -17,9 +20,6 @@ Renderer::Renderer()
     terrain(400, 400),
     light()
 {
-    unsigned int VAO;
-    terrain.generate_terrain();
-
 
     // simple way to set the callback of the pointer.
     glfwSetWindowUserPointer(window.getGLFWWindow(), &camera);
@@ -51,10 +51,10 @@ Renderer::Renderer()
     ImGui::StyleColorsDark();
 }
 
-// TODO: create an array of colors and heights for the terrain and send them to the shaders.
 void Renderer::loop() {
     float lastFrame = 0.0f;
 
+    std::future<void> future = std::async(&Terrain::update, &terrain, camera.position());
     while (!glfwWindowShouldClose(window.getGLFWWindow())) {
         glfwPollEvents();
         float currentFrame = glfwGetTime();
@@ -65,18 +65,24 @@ void Renderer::loop() {
         shader.use();
         shader.setMat4("view", camera.lookAt());
         shader.setMat4("projection", camera.projection());
-        shader.setVec3("lightPos", light.position());
-        shader.setVec3("lightColor", light.color());
         shader.setVec3("cameraPos", camera.position());
-        terrain.set_shader_data(shader);
+        terrain.set_uniforms(shader);
+        light.set_uniforms(shader);
 
         int display_w, display_h;
         glfwGetFramebufferSize(window.getGLFWWindow(), &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        render_ImGui();
+        if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            terrain.bind();
+            terrain.delete_chunks();
+            if (terrain.needs_update(camera.position()))
+                future = std::async(&Terrain::update, &terrain, camera.position());
+        }
+        terrain.draw();
 
+        render_ImGui();
         glfwSwapBuffers(window.getGLFWWindow());
     }
 }
@@ -105,14 +111,26 @@ void Renderer::render_ImGui() {
     ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes!");
 
     if (ImGui::CollapsingHeader("Presets")) {
+        std::array<std::string, 4> presets { "Mountains", "Desert", "Hills", "Plains" };
+        static int current_preset = 0;
+        if (ImGui::BeginListBox("Presets", ImVec2(0, 80))) {
+            for (int i = 0; i < presets.size(); i++) {
+                const bool is_selected = (current_preset == i);
+                if (ImGui::Selectable(presets[i].c_str(), is_selected)) {
+                    current_preset = i;
+                    set_preset(presets[i]);
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndListBox();
+        }
     }
     if (ImGui::CollapsingHeader("Noise")) {
-        if (terrain.noise().ImGui())
-            terrain.generate_terrain();
+        terrain.noise().ImGui();
     }
     if (ImGui::CollapsingHeader("Terrain")) {
-        if (terrain.ImGui())
-            terrain.generate_terrain();
+        terrain.ImGui();
     }
     if (ImGui::CollapsingHeader("Camera")) {
         camera.ImGui();
@@ -125,10 +143,35 @@ void Renderer::render_ImGui() {
     }
     ImGui::End(); // End Config window
 
-    glDrawElements(GL_TRIANGLES, terrain.size(), GL_UNSIGNED_INT, 0);
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Renderer::set_preset(std::string preset) {
+    if (preset == "Mountains") {
+        terrain.noise().set_scale(15.0);
+        terrain.noise().set_octaves(10);
+        terrain.noise().set_persistence(0.512);
+        terrain.set_heights(-20.0, -10.0, 0.0, 15.0, 70.0);
+    }
+    else if (preset == "Desert") {
+        terrain.noise().set_scale(10.0);
+        terrain.noise().set_octaves(2);
+        terrain.noise().set_persistence(0.512);
+        terrain.set_heights(-20.0, 50.0, 0.0, 15.0, 70.0);
+    }
+    else if (preset == "Hills") {
+        terrain.noise().set_scale(20.0);
+        terrain.noise().set_octaves(2);
+        terrain.noise().set_persistence(0.3);
+        terrain.set_heights(-30.0, -55.0, 70.0, 15.0, 70.0);
+    }
+    else if (preset == "Plains") {
+        terrain.noise().set_scale(1.0);
+        terrain.noise().set_octaves(2);
+        terrain.noise().set_persistence(0.5);
+        terrain.set_heights(-20.0, -10.0, 0.0, 15.0, 70.0);
+    }
 }
 
 // Using this for buttons that get held down (movement)
