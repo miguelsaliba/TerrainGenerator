@@ -34,6 +34,9 @@ Window::Window(int width, int height, const char* title)
 
     glViewport(0, 0, width, height);
 
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
 
     glEnable(GL_DEPTH_TEST);
     // Hide cursor

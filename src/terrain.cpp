@@ -19,7 +19,7 @@ Terrain::Terrain(int w, int h) {
 
 void Terrain::init_arrays() {
     colors[0] = glm::vec3(0.2f, 0.3f, 0.8f); // water
-    colors[1] = glm::vec3(0.6f, 0.6f, 0.1f); // sand
+    colors[1] = glm::vec3(0.7f, 0.6f, 0.3f); // sand
     colors[2] = glm::vec3(0.3f, 0.5f, 0.2f); // grass
     colors[3] = glm::vec3(0.2f, 0.2f, 0.2f); // rock
     colors[4] = glm::vec3(0.8f, 0.8f, 0.8f); // snow
@@ -95,7 +95,7 @@ void Terrain::bind() {
     while (!not_bound.empty()) {
         unique_ptr<Chunk> chunk = std::move(not_bound.back());
         chunk->bind_data();
-        chunks.insert(pair<pair<int, int>, unique_ptr<Chunk>>(chunk->get_coords(), std::move(chunk)));
+        chunks.insert(std::make_pair(chunk->get_coords(), std::move(chunk)));
         not_bound.pop_back();
     }
 }
@@ -129,11 +129,11 @@ bool Terrain::ImGui() {
     ImGui::ColorEdit3("Grass", &colors[2][0]);
     ImGui::ColorEdit3("Rock", &colors[3][0]);
     ImGui::ColorEdit3("Snow", &colors[4][0]);
-    ImGui::DragFloat("Water height", &heights[0], 0.1, -50, 50);
-    ImGui::DragFloat("Sand height", &heights[1], 0.1, -50, 50);
-    ImGui::DragFloat("Grass height", &heights[2], 0.1, -50, 50);
-    ImGui::DragFloat("Rock height", &heights[3], 0.1, -50, 50);
-    ImGui::DragFloat("Snow height", &heights[4], 0.1, -50, 50);
+    ImGui::DragFloat("Water height", &heights[0], 0.1, -100, 100);
+    ImGui::DragFloat("Sand height", &heights[1], 0.1, -100, 100);
+    ImGui::DragFloat("Grass height", &heights[2], 0.1, -100, 100);
+    ImGui::DragFloat("Rock height", &heights[3], 0.1, -100, 100);
+    ImGui::DragFloat("Snow height", &heights[4], 0.1, -100, 100);
     return changed;
 }
 

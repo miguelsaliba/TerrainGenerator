@@ -36,6 +36,7 @@ target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glew32s glfw3)
 ELSE()
 
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 set(CMAKE_PREFIX_PATH
     /encs # For ENCS lab computers
@@ -57,6 +58,6 @@ aux_source_directory(src SOURCE)
 
 add_executable(${PROJECT_NAME} ${SOURCE} ${INCLUDE})
 
-target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::glew glfw)
+target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::glew glfw ${CMAKE_DL_LIBS})
 
 ENDIF()

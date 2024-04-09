@@ -11,7 +11,6 @@
 #include <future>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <string_view>
 
 Renderer::Renderer()
     : window(Constants::WIDTH, Constants::HEIGHT, "Terrain Generator"),
@@ -20,6 +19,7 @@ Renderer::Renderer()
     terrain(400, 400),
     light()
 {
+    set_preset("Mountains");
 
     // simple way to set the callback of the pointer.
     glfwSetWindowUserPointer(window.getGLFWWindow(), &camera);
@@ -152,7 +152,7 @@ void Renderer::set_preset(std::string preset) {
         terrain.noise().set_scale(15.0);
         terrain.noise().set_octaves(10);
         terrain.noise().set_persistence(0.512);
-        terrain.set_heights(-20.0, -10.0, 0.0, 15.0, 70.0);
+        terrain.set_heights(-20.0, -10.0, 20.0, 35.0, 50.0);
     }
     else if (preset == "Desert") {
         terrain.noise().set_scale(10.0);

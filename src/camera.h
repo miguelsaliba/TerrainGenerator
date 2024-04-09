@@ -36,10 +36,10 @@ private:
     float yaw = 45.0f;
     float pitch = 0.0f;
     float near = 0.1f;
-    float far = 400.0f;
+    float far = 1000.0f;
 
     // constants
-    float speed = 10.0f;
+    float speed = 100.0f;
     float fov = 90.0f;
     static glm::vec3 world_up;
 };

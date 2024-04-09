@@ -22,6 +22,7 @@ private:
     int octaves = 10;
     float persistence = 0.512;
     float scale = 15;
+    float featureSize = 1;
     static float lerp(float amount, float left, float right);
     static float grad(int hash, float x, float y);
     static float fade(float t);

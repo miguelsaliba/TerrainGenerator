@@ -39,6 +39,8 @@ bool Perlin::ImGui() {
         changed = true;
     if (ImGui::DragFloat("Scale", &scale, 0.05, 0.01, 100))
         changed = true;
+    if (ImGui::DragFloat("Feature Size", &featureSize, 0.05, 0.01, 100))
+        changed = true;
     return changed;
 }
 
@@ -56,6 +58,8 @@ void Perlin::shuffle() {
 }
 
 float Perlin::octaveNoise(float x, float y) {
+    x *= featureSize;
+    y *= featureSize;
     float total = 0;
     float frequency = 1;
     float amplitude = 1;
