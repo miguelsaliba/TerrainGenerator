@@ -7,7 +7,7 @@
 class Chunk {
 public:
     Chunk() = default;
-    Chunk(int size, int offset_x, int offset_z, Perlin &perlin, float triangle_size);
+    Chunk(int size, int offset_x, int offset_z, Perlin &perlin, float triangle_size, float texture_interval);
     ~Chunk();
     void generate();
     void draw();
@@ -21,6 +21,7 @@ private:
     int size;
     int offset_x, offset_z;
     float triangle_size = 0.005;
+    float texture_interval = 100;
     Perlin *perlin;
 };
 

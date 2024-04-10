@@ -2,6 +2,7 @@
 #define CAMERA_H_
 
 #include "constants.h"
+#include "shader.h"
 #include "window.h"
 #include <glm/glm.hpp>
 
@@ -25,6 +26,7 @@ public:
     void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
     void printPos();
     void ImGui();
+    void set_uniforms(Shader &shader);
 
 private:
     glm::vec3 pos;

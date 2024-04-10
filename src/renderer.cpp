@@ -17,7 +17,8 @@ Renderer::Renderer()
     camera(),
     shader("../shaders/mountain.vert", "../shaders/mountain.frag"),
     terrain(400, 400),
-    light()
+    light(),
+    texture_handler()
 {
     set_preset("Mountains");
 
@@ -41,6 +42,15 @@ Renderer::Renderer()
     background_color = glm::vec3(0.6f, 0.8f, 1.0f);
     set_background_color();
 
+    vector<string> texture_filenames = {
+        "../textures/water.png",
+        "../textures/sand.png",
+        "../textures/grass.png",
+        "../textures/stone.png",
+        "../textures/snow.png"
+    };
+    texture_handler.loadTextures(texture_filenames);
+
     shader.use();
 
     IMGUI_CHECKVERSION();
@@ -62,10 +72,14 @@ void Renderer::loop() {
         lastFrame = currentFrame;
         key_handler(window.getGLFWWindow(), deltaTime);
 
+        texture_handler.bindTextures();
+        shader.setInt("texture1", 0);
+        shader.setInt("texture2", 1);
+        shader.setInt("texture3", 2);
+        shader.setInt("texture4", 3);
+        shader.setInt("texture5", 4);
         shader.use();
-        shader.setMat4("view", camera.lookAt());
-        shader.setMat4("projection", camera.projection());
-        shader.setVec3("cameraPos", camera.position());
+        camera.set_uniforms(shader);
         terrain.set_uniforms(shader);
         light.set_uniforms(shader);
 

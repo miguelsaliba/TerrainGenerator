@@ -40,6 +40,9 @@ private:
     float triangle_size = 0.005;
     int render_distance = 5;
     int chunk_size = 100;
+    float texture_interval = 25;
+
+    bool texture_enabled = false;
 
     mutable std::mutex mutex;
     std::vector<unique_ptr<Chunk>> to_delete;

@@ -15,12 +15,22 @@ Camera::Camera() : pos(glm::vec3(50.0f, 10.0f, 50.0f)),
     right = glm::normalize(glm::cross(dir, world_up));
 }
 
+glm::mat4 Camera::lookAt() {
+    return glm::lookAt(pos, pos + dir, up);
+}
+
 glm::mat4 Camera::projection() {
     return glm::perspective(glm::radians(fov), (float) Constants::WIDTH / (float) Constants::HEIGHT, near, far);
 }
 
 glm::vec3 &Camera::position() {
     return pos;
+}
+
+void Camera::set_uniforms(Shader &shader) {
+    shader.setMat4("view", lookAt());
+    shader.setMat4("projection", projection());
+    shader.setVec3("viewPos", pos);
 }
 
 void Camera::move(Direction direction, float deltaTime) {
@@ -44,10 +54,6 @@ void Camera::move(Direction direction, float deltaTime) {
             pos -= speed * up * deltaTime;
             break;
         }
-}
-
-glm::mat4 Camera::lookAt() {
-    return glm::lookAt(pos, pos + dir, up);
 }
 
 void Camera::ImGui() {

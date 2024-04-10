@@ -81,7 +81,7 @@ void Terrain::update(glm::vec3 position) {
     for (int i = x - render_distance; i < x + render_distance; i++) {
         for (int j = z - render_distance; j < z + render_distance; j++) {
             if (chunks.find(pair<int, int>(i, j)) == chunks.end()) {
-                unique_ptr<Chunk> chunk = std::make_unique<Chunk>(chunk_size, i, j, perlin, triangle_size);
+                unique_ptr<Chunk> chunk = std::make_unique<Chunk>(chunk_size, i, j, perlin, triangle_size, texture_interval);
                 chunk->generate();
                 not_bound.emplace_back(std::move(chunk));
             }
@@ -118,6 +118,9 @@ void Terrain::set_heights(float water, float sand, float grass, float rock, floa
 
 bool Terrain::ImGui() {
     bool changed = false;
+    ImGui::Checkbox("Texture", &texture_enabled);
+    if (ImGui::InputFloat("Texture interval", &texture_interval))
+        changed = true;
     if (ImGui::InputInt("Chunk Size", &chunk_size))
         changed = true;
     if (ImGui::InputFloat("Triangle size", &triangle_size))
@@ -140,4 +143,5 @@ bool Terrain::ImGui() {
 void Terrain::set_uniforms(Shader &shader) {
     shader.setFloatArray("heights", 5, heights);
     shader.setVec3Array("colors", 5, colors);
+    shader.setBool("texture_enabled", texture_enabled);
 }

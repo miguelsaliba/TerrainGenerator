@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "terrain.h"
 #include "window.h"
+#include "texture.h"
 
 class Renderer {
 public:
@@ -27,6 +28,7 @@ private:
     Camera camera;
     Shader shader;
     Terrain terrain;
+    TextureHandler texture_handler;
 };
 
 #endif  // RENDERER_H_

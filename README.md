@@ -23,3 +23,6 @@
 | D      | Move right           |
 | SPACE  | Move up              |
 | LCTRL  | Move down            |
+
+# Credits
+- [ManyTextures](https://www.manytextures.com) for the textures. [license](http://creativecommons.org/licenses/by/4.0/)
