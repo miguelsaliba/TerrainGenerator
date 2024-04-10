@@ -39,7 +39,7 @@ bool Perlin::ImGui() {
         changed = true;
     if (ImGui::DragFloat("Scale", &scale, 0.05, 0.01, 100))
         changed = true;
-    if (ImGui::DragFloat("Feature Size", &featureSize, 0.05, 0.01, 100))
+    if (ImGui::SliderFloat("Feature Size", &featureSize, 0.001, 1.0))
         changed = true;
     return changed;
 }

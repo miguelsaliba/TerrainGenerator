@@ -40,9 +40,11 @@ void Chunk::generate() {
         for (int j = 0; j < chunk_size; j++) {
             float x = (float)(start_x + j) * triangle_size;
             float z = (float)(start_z + i) * triangle_size;
+            float noise_value = perlin->octaveNoise(x, z) * 2;
+
             float u = (float)(start_x + j) / texture_interval;
             float v = (float)(start_z + i) / texture_interval;
-            float noise_value = perlin->octaveNoise(x, z) * 2;
+
             vertex_data.push_back(start_x + j);
             vertex_data.push_back(noise_value);
             vertex_data.push_back(start_z + i);

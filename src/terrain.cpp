@@ -19,8 +19,8 @@ Terrain::Terrain(int w, int h) {
 
 void Terrain::init_arrays() {
     colors[0] = glm::vec3(0.2f, 0.3f, 0.8f); // water
-    colors[1] = glm::vec3(0.7f, 0.6f, 0.3f); // sand
-    colors[2] = glm::vec3(0.3f, 0.5f, 0.2f); // grass
+    colors[1] = glm::vec3(0.6f, 0.55f, 0.4f); // sand
+    colors[2] = glm::vec3(0.3f, 0.4f, 0.1f); // grass
     colors[3] = glm::vec3(0.2f, 0.2f, 0.2f); // rock
     colors[4] = glm::vec3(0.8f, 0.8f, 0.8f); // snow
     heights[0] = -20.0f; // water

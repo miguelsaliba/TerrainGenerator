@@ -7,7 +7,7 @@
 
 class Light {
 public:
-    Light() : position_(glm::vec3(100.0f, 100.0f, 100.0f)), color_(glm::vec3(1.0f, 1.0f, 1.0f)) { }
+    Light() : position_(glm::vec3(2000.0f, 2600.0f, 100.0f)), color_(glm::vec3(1.0f, 1.0f, 1.0f)) { }
     void ImGui() {
         ImGui::DragFloat3("Position", &position_.x);
         ImGui::ColorEdit3("Color", &color_.x);

@@ -22,6 +22,7 @@ private:
     int offset_x, offset_z;
     float triangle_size = 0.005;
     float texture_interval = 100;
+    float horizontal_scale = 0.1;
     Perlin *perlin;
 };
 

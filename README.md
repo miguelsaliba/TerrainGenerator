@@ -1,15 +1,3 @@
-## TODO:
-
-- [x] Window
-- [x] Camera (learn opengl)
-- [x] Basic terrain
-    - [x] Flat surface
-    - [x] Add perlin noise
-    - [x] Add colors for mountains
-- [x] GUI (Imgui)
-- [x] Noise function
-
-
 # Procedural Terrain Generator
 
 ## Controls
@@ -23,6 +11,27 @@
 | D      | Move right           |
 | SPACE  | Move up              |
 | LCTRL  | Move down            |
+| LSHIFT | Move faster          |
+
+## Building
+
+### Dependencies
+
+- [CMake](https://cmake.org)
+- [OpenGL](https://www.opengl.org)
+- [GLFW](https://www.glfw.org)
+- [GLM](https://github.com/g-truc/glm)
+- [GLEW](http://glew.sourceforge.net)
+
+### Building
+```bash
+mkdir build && cd build && cmake .. && make
+```
+
+### Running
+```bash
+./terrain
+```
 
 # Credits
 - [ManyTextures](https://www.manytextures.com) for the textures. [license](http://creativecommons.org/licenses/by/4.0/)

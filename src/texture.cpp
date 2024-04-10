@@ -58,7 +58,7 @@ GLuint TextureHandler::loadTexture(const string& texture_filename) {
 }
 
 void TextureHandler::bindTextures() {
-    // loop over all textures from GL_TEXTURE0 to GL_TEXTURE5
+    // loop over all textures from GL_TEXTURE0 to GL_TEXTURE4
     for (size_t i = 0; i < texture_ids_.size(); i++) {
         bindTexture(GL_TEXTURE0 + i, texture_ids_[i]);
     }

@@ -106,7 +106,7 @@ void Renderer::render_ImGui() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::ShowDemoWindow(); // Demo window for debugging
+    // ImGui::ShowDemoWindow(); // Demo window for debugging
     ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_FirstUseEver);
 
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_MenuBar);
@@ -133,6 +133,7 @@ void Renderer::render_ImGui() {
                 if (ImGui::Selectable(presets[i].c_str(), is_selected)) {
                     current_preset = i;
                     set_preset(presets[i]);
+                    terrain.generate_terrain();
                 }
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
@@ -166,7 +167,7 @@ void Renderer::set_preset(std::string preset) {
         terrain.noise().set_scale(15.0);
         terrain.noise().set_octaves(10);
         terrain.noise().set_persistence(0.512);
-        terrain.set_heights(-20.0, -10.0, 20.0, 35.0, 50.0);
+        terrain.set_heights(-20.0, -15.0, 20.0, 35.0, 50.0);
     }
     else if (preset == "Desert") {
         terrain.noise().set_scale(10.0);

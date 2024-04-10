@@ -15,6 +15,7 @@ uniform float ambientStrength;
 
 uniform bool texture_enabled;
 uniform float heights[5];
+uniform vec3 colors[5];
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler2D texture3;
@@ -44,6 +45,7 @@ float getPercentage(float up, float down, float percent) {
     return down + (up - down) * percent;
 }
 
+// TODO: move the texture calls outside the if statements
 vec3 calculateTextureColor(vec3 color) {
     float interp1down = getPercentage(heights[1], heights[0], 0.75);
     float interp1up   = getPercentage(heights[2], heights[1], 0.25);
@@ -51,32 +53,37 @@ vec3 calculateTextureColor(vec3 color) {
     float interp2up   = getPercentage(heights[3], heights[2], 0.25);
     float interp3down = getPercentage(heights[3], heights[2], 0.75);
     float interp3up   = getPercentage(heights[4], heights[3], 0.25);
+    vec3 fragColor1 = texture(texture1, TexCoords).rgb;
+    vec3 fragColor2 = texture(texture2, TexCoords).rgb;
+    vec3 fragColor3 = texture(texture3, TexCoords).rgb;
+    vec3 fragColor4 = texture(texture4, TexCoords).rgb;
+    vec3 fragColor5 = texture(texture5, TexCoords).rgb;
     if (FragPos.y < heights[0]) {
-        color = texture(texture1, TexCoords).rgb;
+        color = colors[0];
     }
     else if (FragPos.y < interp1down) {
         color = texture(texture2, TexCoords).rgb;
     }
     else if (FragPos.y < interp1up) {
         float blend = (FragPos.y - interp1down) / (interp1up - interp1down);
-        color = mix(texture(texture2, TexCoords).rgb, texture(texture3, TexCoords).rgb, blend);
+        color = mix(fragColor2, fragColor3, blend);
     }
     else if (FragPos.y < interp2down) {
-        color = texture(texture3, TexCoords).rgb;
+        color = fragColor3;
     }
     else if (FragPos.y < interp2up) {
         float blend = (FragPos.y - interp2down) / (interp2up - interp2down);
-        color = mix(texture(texture3, TexCoords).rgb, texture(texture4, TexCoords).rgb, blend);
+        color = mix(fragColor3, fragColor4, blend);
     }
     else if (FragPos.y < interp3down) {
-        color = texture(texture4, TexCoords).rgb;
+        color = fragColor4;
     }
     else if (FragPos.y < interp3up) {
         float blend = (FragPos.y - interp3down) / (interp3up - interp3down);
-        color = mix(texture(texture4, TexCoords).rgb, texture(texture5, TexCoords).rgb, blend);
+        color = mix(fragColor4, fragColor5, blend);
     }
     else {
-        color = texture(texture5, TexCoords).rgb;
+        color = fragColor5;
     }
     return color;
 }
