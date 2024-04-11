@@ -118,14 +118,14 @@ void Terrain::set_heights(float water, float sand, float grass, float rock, floa
 
 bool Terrain::ImGui() {
     bool changed = false;
-    ImGui::Checkbox("*Texture", &texture_enabled);
+    ImGui::Checkbox("Texture", &texture_enabled);
     if (ImGui::InputFloat("*Texture interval", &texture_interval))
         changed = true;
     if (ImGui::InputInt("*Chunk Size", &chunk_size))
         changed = true;
     if (ImGui::InputFloat("*Triangle size", &triangle_size))
         changed = true;
-    if (ImGui::InputInt("Render distance", &render_distance))
+    if (ImGui::InputInt("*Render distance", &render_distance))
         changed = true;
     ImGui::ColorEdit3("Water", &colors[0][0]);
     ImGui::ColorEdit3("Sand", &colors[1][0]);

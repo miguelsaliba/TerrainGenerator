@@ -19,7 +19,7 @@ Perlin::Perlin(unsigned int seed) : seed(seed) {
 bool Perlin::ImGui() {
     // 0 to remove step
     bool changed = false;
-    if (ImGui::InputInt("Seed", &seed, 0)) {
+    if (ImGui::InputInt("*Seed", &seed, 0)) {
         shuffle();
         changed = true;
     }
@@ -33,13 +33,13 @@ bool Perlin::ImGui() {
         shuffle();
         changed = true;
     }
-    if (ImGui::SliderFloat("Persistence", &persistence, 0.0, 1.0))
+    if (ImGui::SliderFloat("*Persistence", &persistence, 0.0, 1.0))
         changed = true;
-    if (ImGui::SliderInt("Octaves", &octaves, 0, 20))
+    if (ImGui::SliderInt("*Octaves", &octaves, 0, 20))
         changed = true;
-    if (ImGui::DragFloat("Scale", &scale, 0.05, 0.01, 100))
+    if (ImGui::DragFloat("*Scale", &scale, 0.05, 0.01, 100))
         changed = true;
-    if (ImGui::SliderFloat("Feature Size", &featureSize, 0.001, 1.0))
+    if (ImGui::SliderFloat("*Feature Size", &featureSize, 0.001, 1.0))
         changed = true;
     return changed;
 }

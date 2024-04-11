@@ -122,7 +122,7 @@ void Renderer::render_ImGui() {
     }
 
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-    ImGui::Text("Click the \"Generate\" button or press \nEnter to apply changes \nfor anything with a *!");
+    ImGui::Text("Click the \"Generate\" button or press Enter to \napply changes for anything with a *!");
 
     if (ImGui::CollapsingHeader("Presets")) {
         std::array<std::string, 4> presets { "Mountains", "Desert", "Hills", "Plains" };
