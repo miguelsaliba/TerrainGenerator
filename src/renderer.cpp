@@ -15,7 +15,7 @@
 Renderer::Renderer()
     : window(Constants::WIDTH, Constants::HEIGHT, "Terrain Generator"),
     camera(),
-    shader("../shaders/mountain.vert", "../shaders/mountain.frag"),
+    shader("../../../shaders/mountain.vert", "../../../shaders/mountain.frag"),
     terrain(400, 400),
     light(),
     texture_handler()
@@ -43,11 +43,11 @@ Renderer::Renderer()
     set_background_color();
 
     vector<string> texture_filenames = {
-        "../textures/water.png",
-        "../textures/sand.png",
-        "../textures/grass.png",
-        "../textures/stone.png",
-        "../textures/snow.png"
+        "../../../textures/water.png",
+        "../../../textures/sand.png",
+        "../../../textures/grass.png",
+        "../../../textures/stone.png",
+        "../../../textures/snow.png"
     };
     texture_handler.loadTextures(texture_filenames);
 

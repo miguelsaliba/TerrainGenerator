@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
 project(terrain) # The name of your choice for the project comes here
 
+add_definitions(-DGLEW_STATIC)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# imgui stuff
+# imgui and stb_image stuff
 include_directories(include)
 file(GLOB INCLUDE "include/*.cpp")
 
