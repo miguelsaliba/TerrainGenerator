@@ -39,7 +39,7 @@ private:
     int last_chunk_z;
     float triangle_size = 0.005;
     int render_distance = 5;
-    int chunk_size = 100;
+    int chunk_size = 200;
     float texture_interval = 25;
 
     bool texture_enabled = false;

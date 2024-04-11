@@ -179,7 +179,7 @@ void Renderer::set_preset(std::string preset) {
         terrain.noise().set_scale(20.0);
         terrain.noise().set_octaves(2);
         terrain.noise().set_persistence(0.3);
-        terrain.set_heights(-30.0, -55.0, 70.0, 15.0, 70.0);
+        terrain.set_heights(-30.0, -55.0, 100.0, 15.0, 70.0);
     }
     else if (preset == "Plains") {
         terrain.noise().set_scale(1.0);

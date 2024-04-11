@@ -9,7 +9,7 @@
 
 glm::vec3 Camera::world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-Camera::Camera() : pos(glm::vec3(50.0f, 10.0f, 50.0f)),
+Camera::Camera() : pos(glm::vec3(50.0f, 50.0f, 50.0f)),
                up(glm::vec3(0.0f, 1.0f, 0.0f)),
                dir(glm::vec3(0.0f, 0.0f, -1.0f)) {
     right = glm::normalize(glm::cross(dir, world_up));
